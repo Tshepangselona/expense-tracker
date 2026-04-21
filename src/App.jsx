@@ -1,38 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
 import "./App.css";
-
-const STORAGE_KEY = "expense-tracker-items";
-
-const CATEGORY_COLORS = {
-  Food: "#ef4444",
-  Transport: "#3b82f6",
-  Bills: "#f59e0b",
-  Shopping: "#22c55e",
-  Health: "#8b5cf6",
-  Entertainment: "#ec4899",
-  Other: "#6b7280",
-};
-
-const CATEGORIES = Object.keys(CATEGORY_COLORS);
-
-const currency = new Intl.NumberFormat("en-ZA", {
-  style: "currency",
-  currency: "ZAR",
-});
-
-function formatDate(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
-}
+import ExpenseChart from "./components/ExpenseChart";
+import ExpenseForm from "./components/ExpenseForm";
+import ExpenseList from "./components/ExpenseList";
+import Header from "./components/Header";
+import { CATEGORIES, CATEGORY_COLORS, STORAGE_KEY } from "./constants";
 
 function App() {
   const [expenses, setExpenses] = useState([]);
@@ -118,133 +90,26 @@ function App() {
 
   return (
     <main className="app">
-      <header className="hero">
-        <h1>Expense Tracker</h1>
-        <p>Track spending, spot trends, and stay on budget.</p>
-      </header>
-
-      <section className="card">
-        <h2>Add Expense</h2>
-        <form className="expense-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Expense name"
-            value={form.title}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="number"
-            name="amount"
-            min="0.01"
-            step="0.01"
-            placeholder="Amount"
-            value={form.amount}
-            onChange={handleInputChange}
-            required
-          />
-          <select name="category" value={form.category} onChange={handleInputChange}>
-            {CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          <input
-            type="date"
-            name="date"
-            value={form.date}
-            onChange={handleInputChange}
-            required
-          />
-          <button type="submit">Add</button>
-        </form>
-      </section>
+      <Header />
+      <ExpenseForm
+        form={form}
+        categories={CATEGORIES}
+        onInputChange={handleInputChange}
+        onSubmit={handleSubmit}
+      />
 
       <section className="grid">
-        <article className="card">
-          <div className="row">
-            <h2>Overview</h2>
-            <strong>{currency.format(totalAmount)}</strong>
-          </div>
-          <div className="controls">
-            <input
-              type="search"
-              placeholder="Search by title"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-            <select
-              value={filterCategory}
-              onChange={(event) => setFilterCategory(event.target.value)}
-            >
-              <option value="All">All categories</option>
-              {CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-          <ul className="expense-list">
-            {filteredExpenses.length === 0 ? (
-              <li className="empty">No expenses yet.</li>
-            ) : (
-              filteredExpenses.map((item) => (
-                <li key={item.id}>
-                  <div>
-                    <p>{item.title}</p>
-                    <small>
-                      {item.category} • {formatDate(item.date)}
-                    </small>
-                  </div>
-                  <div className="amount-group">
-                    <strong>{currency.format(item.amount)}</strong>
-                    <button
-                      type="button"
-                      className="danger"
-                      onClick={() => removeExpense(item.id)}
-                      aria-label={`Delete ${item.title}`}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </article>
-
-        <article className="card chart-card">
-          <h2>By Category</h2>
-          {chartData.length === 0 ? (
-            <p className="empty">Add expenses to see chart insights.</p>
-          ) : (
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  dataKey="value"
-                  nameKey="name"
-                  outerRadius={105}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                >
-                  {chartData.map((entry) => (
-                    <Cell
-                      key={`cell-${entry.name}`}
-                      fill={CATEGORY_COLORS[entry.name] || "#9ca3af"}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => currency.format(value)} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
-        </article>
+        <ExpenseList
+          totalAmount={totalAmount}
+          search={search}
+          onSearchChange={setSearch}
+          filterCategory={filterCategory}
+          onFilterChange={setFilterCategory}
+          categories={CATEGORIES}
+          expenses={filteredExpenses}
+          onRemove={removeExpense}
+        />
+        <ExpenseChart chartData={chartData} categoryColors={CATEGORY_COLORS} />
       </section>
     </main>
   );
