@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import { createExpense, deleteExpense, fetchExpenses } from "./api/expenses";
 import ExpenseChart from "./components/ExpenseChart";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
 import Header from "./components/Header";
-import { CATEGORIES, CATEGORY_COLORS, STORAGE_KEY } from "./constants";
+import { CATEGORIES, CATEGORY_COLORS } from "./constants";
 
 function App() {
   const [expenses, setExpenses] = useState([]);
@@ -16,23 +17,25 @@ function App() {
   });
   const [filterCategory, setFilterCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        setExpenses(parsed);
+    async function loadExpenses() {
+      try {
+        const data = await fetchExpenses();
+        setExpenses(Array.isArray(data) ? data : []);
+        setError("");
+      } catch (loadError) {
+        setError(loadError.message || "Could not load expenses.");
+      } finally {
+        setIsLoading(false);
       }
-    } catch {
-      localStorage.removeItem(STORAGE_KEY);
     }
-  }, []);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
-  }, [expenses]);
+    loadExpenses();
+  }, []);
 
   const filteredExpenses = useMemo(() => {
     return expenses
@@ -64,7 +67,7 @@ function App() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const amount = Number(form.amount);
 
@@ -72,20 +75,32 @@ function App() {
       return;
     }
 
-    const newExpense = {
-      id: Date.now(),
-      title: form.title.trim(),
-      amount,
-      category: form.category,
-      date: form.date,
-    };
-
-    setExpenses((prev) => [...prev, newExpense]);
-    setForm((prev) => ({ ...prev, title: "", amount: "" }));
+    try {
+      setIsSaving(true);
+      setError("");
+      const createdExpense = await createExpense({
+        title: form.title.trim(),
+        amount,
+        category: form.category,
+        date: form.date,
+      });
+      setExpenses((prev) => [...prev, createdExpense]);
+      setForm((prev) => ({ ...prev, title: "", amount: "" }));
+    } catch (saveError) {
+      setError(saveError.message || "Could not save expense.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
-  function removeExpense(id) {
-    setExpenses((prev) => prev.filter((item) => item.id !== id));
+  async function removeExpense(id) {
+    try {
+      setError("");
+      await deleteExpense(id);
+      setExpenses((prev) => prev.filter((item) => item.id !== id));
+    } catch (removeError) {
+      setError(removeError.message || "Could not delete expense.");
+    }
   }
 
   return (
@@ -96,6 +111,7 @@ function App() {
         categories={CATEGORIES}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
+        isSaving={isSaving}
       />
 
       <section className="grid">
@@ -108,6 +124,8 @@ function App() {
           categories={CATEGORIES}
           expenses={filteredExpenses}
           onRemove={removeExpense}
+          isLoading={isLoading}
+          error={error}
         />
         <ExpenseChart chartData={chartData} categoryColors={CATEGORY_COLORS} />
       </section>

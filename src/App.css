@@ -105,6 +105,12 @@ button:active {
   transform: translateY(0);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+}
+
 .grid {
   margin-top: 1.05rem;
   display: grid;
@@ -178,6 +184,16 @@ button:active {
 .empty {
   color: #64748b;
   margin: 0.55rem 0;
+}
+
+.error-banner {
+  margin: 0 0 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.92rem;
 }
 
 .chart-card {

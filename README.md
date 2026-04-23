@@ -1,6 +1,6 @@
 # Expense Tracker
 
-A clean React expense tracker with category insights and local persistence.
+A modern React expense tracker with category insights and a database-backed API.
 
 ## Features
 
@@ -8,13 +8,14 @@ A clean React expense tracker with category insights and local persistence.
 - Filter by category and search by title
 - See live totals based on active filters
 - View spending breakdown with a pie chart
-- Data is saved in `localStorage`
+- Data is persisted in a SQLite database via an Express API
 
 ## Scripts
 
 In the project directory, run:
 
-- `npm start` - start the development server
+- `npm start` - start both API (`:4000`) and frontend (`:3000`)
+- `npm run api` - start only the Express API server
 - `npm test` - run tests in watch mode
 - `npm run build` - create a production build
 
@@ -22,6 +23,8 @@ In the project directory, run:
 
 - React
 - Recharts
+- Express
+- SQLite
 - Create React App
 
 ## Next Ideas
