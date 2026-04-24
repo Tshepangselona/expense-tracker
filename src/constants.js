@@ -1,5 +1,3 @@
-export const STORAGE_KEY = "expense-tracker-items";
-
 export const CATEGORY_COLORS = {
   Food: "#ef4444",
   Transport: "#3b82f6",

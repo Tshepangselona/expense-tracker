@@ -1,4 +1,4 @@
-function ExpenseForm({ form, categories, onInputChange, onSubmit }) {
+function ExpenseForm({ form, categories, onInputChange, onSubmit, isSaving }) {
   return (
     <section className="card">
       <h2>Add Expense</h2>
@@ -35,7 +35,9 @@ function ExpenseForm({ form, categories, onInputChange, onSubmit }) {
           onChange={onInputChange}
           required
         />
-        <button type="submit">Add</button>
+        <button type="submit" disabled={isSaving}>
+          {isSaving ? "Saving..." : "Add"}
+        </button>
       </form>
     </section>
   );

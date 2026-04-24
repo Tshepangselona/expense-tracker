@@ -9,6 +9,8 @@ function ExpenseList({
   categories,
   expenses,
   onRemove,
+  isLoading,
+  error,
 }) {
   return (
     <article className="card">
@@ -32,8 +34,11 @@ function ExpenseList({
           ))}
         </select>
       </div>
+      {error ? <p className="error-banner">{error}</p> : null}
       <ul className="expense-list">
-        {expenses.length === 0 ? (
+        {isLoading ? (
+          <li className="empty">Loading expenses...</li>
+        ) : expenses.length === 0 ? (
           <li className="empty">No expenses yet.</li>
         ) : (
           expenses.map((item) => (
