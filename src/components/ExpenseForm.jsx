@@ -35,7 +35,7 @@ function ExpenseForm({ form, categories, onInputChange, onSubmit, isSaving }) {
           onChange={onInputChange}
           required
         />
-        <button type="submit" disabled={isSaving}>
+        <button type="submit" className="btn-primary" disabled={isSaving}>
           {isSaving ? "Saving..." : "Add"}
         </button>
       </form>

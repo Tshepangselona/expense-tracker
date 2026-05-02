@@ -117,6 +117,7 @@ function App() {
       <section className="grid">
         <ExpenseList
           totalAmount={totalAmount}
+          expenseCount={filteredExpenses.length}
           search={search}
           onSearchChange={setSearch}
           filterCategory={filterCategory}
