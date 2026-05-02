@@ -12,6 +12,7 @@ function ExpenseChart({ chartData, categoryColors }) {
   return (
     <article className="card chart-card">
       <h2>By Category</h2>
+      <p className="muted-text">Spending distribution for current results</p>
       {chartData.length === 0 ? (
         <p className="empty">Add expenses to see chart insights.</p>
       ) : (

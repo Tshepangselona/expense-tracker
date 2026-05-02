@@ -2,6 +2,7 @@ import { currency, formatDate } from "../utils";
 
 function ExpenseList({
   totalAmount,
+  expenseCount,
   search,
   onSearchChange,
   filterCategory,
@@ -15,7 +16,10 @@ function ExpenseList({
   return (
     <article className="card">
       <div className="row">
-        <h2>Overview</h2>
+        <div>
+          <h2>Overview</h2>
+          <p className="muted-text">{expenseCount} matching transactions</p>
+        </div>
         <strong>{currency.format(totalAmount)}</strong>
       </div>
       <div className="controls">
@@ -53,7 +57,7 @@ function ExpenseList({
                 <strong>{currency.format(item.amount)}</strong>
                 <button
                   type="button"
-                  className="danger"
+                  className="danger btn-danger"
                   onClick={() => onRemove(item.id)}
                   aria-label={`Delete ${item.title}`}
                 >
